@@ -1,4 +1,5 @@
 python_scrapper
 ===============
+I like spelling scrapper with double Ps
 
-a scrapper in python for populating sqlite3
+A scrapper in python for populating sqlite3
