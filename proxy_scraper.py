@@ -118,7 +118,7 @@ def checkproxiesmulitpprocess():
 		os.system('clear')
 		start = time.time()
 		print 'Checking Proxies'
-		sql = "SELECT proxy from proxies where `working` = 'UNCHECK'"
+		sql = "SELECT proxy from proxies where `working` = 'UNCHECK' Limit 100"
 		rows = get_records(sql)
 		if rows:
 			for i in range(50):

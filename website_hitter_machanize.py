@@ -1,4 +1,4 @@
-import random, urllib, re, sys, sqlite3, datetime, os, urllib2, socket, multiprocessing, time, Queue, threading, mechanize
+import cookielib, random, urllib, re, sys, sqlite3, datetime, os, urllib2, socket, multiprocessing, time, Queue, threading, mechanize
 from BeautifulSoup import BeautifulSoup as Soup
 
 table_name = 'proxies'
@@ -79,31 +79,27 @@ class ThreadUrl(threading.Thread):
             proxy_info = self.queue.get().strip()
 
             try:
-                #proxy_handler = urllib2.ProxyHandler({'http':proxy_info})
-                #opener = urllib2.build_opener(proxy_handler)
                 ua=random.choice(useragents)
-                #opener.addheaders = [('User-agent',ua), ('Referer', Referer)]
-                #urllib2.install_opener(opener)
-                #req=urllib2.Request(website) 
-                #sock=urllib2.urlopen(req, timeout= 10)
-
-                cj = mechanize.CookieJar()
+                cj = cookielib.LWPCookieJar()
                 browser = mechanize.Browser()
                 browser.set_cookiejar(cj)
+                browser.set_handle_equiv(True)
+                browser.set_handle_gzip(True)
+                browser.set_handle_redirect(True)
+                browser.set_handle_referer(True)
+                browser.set_handle_robots(False)
+
                 browser.addheaders = [('User-agent',ua), ('Referer', Referer)]
                 browser.set_proxies({'http': proxy_info})
 
-                # Use browser's handlers to create a new opener
-                #opener = mechanize.build_opener(*browser.handlers)
-                site = localBrowser.open(website,timeout=100)
-
+                site = browser.open(website,timeout=100)
+                html = browser.read()
                 output.append((proxy_info, 'GOOD'))
                 print website + "-->"+proxy_info + ":" + "OK"
                 i=i+1
             except:
                 output.append((proxy_info, 'BAD'))
                 print website + "-->"+proxy_info + ":" + "BAD"
-            #signals to queue job is done
             self.queue.task_done()
 
 def hitprocess():
@@ -143,7 +139,7 @@ def main():
     init()
     parseLog()
     hitprocess()
-
+    bulk_update_record(output)
 if __name__ == "__main__":
     main()
 	
